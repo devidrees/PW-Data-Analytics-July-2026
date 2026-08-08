@@ -195,7 +195,7 @@ SELECT
 		PARTITION BY department
         ORDER BY date
         ROWS BETWEEN 6 PRECEDING AND CURRENT ROW        
-    ) AS 3_person_sliding_average
+    ) AS 7_person_sliding_average
 FROM employees;
 
 -- 5 day rolling sum
