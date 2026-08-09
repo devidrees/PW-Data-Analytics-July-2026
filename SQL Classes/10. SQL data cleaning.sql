@@ -38,22 +38,96 @@ FROM employees_raw;
 -- Running average? 
 SELECT 
 	name, department, salary,
-    COALESCE(salary,
-	-- LAG(salary) OVER(PARTITION BY department ORDER BY emp_id)
+    COALESCE(salary, 
+    -- LAG(salary) OVER(PARTITION BY department ORDER BY emp_id)
     -- LEAD(salary) OVER(PARTITION BY department ORDER BY emp_id)
     -- here we are imputing the 7 people average into the null value
-    AVG(salary) OVER(
-    PARTITION BY department 
-    ORDER BY emp_id 
-    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) -- selects the whole partition (here department)
-    ) AS Filled_salary
+    AVG(salary) OVER(PARTITION BY department ORDER BY emp_id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) -- selects the whole partition (here department)
+    
+	) AS Filled_salary
 FROM employees_raw;
 
 -- Removal of duplicates
+-- if you want to check the uniques in a table
+SELECT DISTINCT 
+	emp_id, name, department
+FROM employees_raw;
+
+
+SELECT 
+	emp_id, name, department,
+	COUNT(*) AS count
+FROM employees_raw
+GROUP BY emp_id, name, department
+HAVING count > 1;
+
+-- Common Table Expressions (CTE)
+-- CTE is a temporary named result set  -- 
+	-- imagine: you write a query, stick it to the wall
+    -- then you query that sticky note directly
+-- we use the keyword WITH to create a CTE
+WITH IT_wala_department AS (
+	SELECT * FROM employees_raw
+    WHERE department = 'IT'
+)
+SELECT * FROM
+IT_wala_department
+WHERE salary > 80000;
+
+
+-- we want to delete the duplicate rows and keep the originals
+WITH DuplicateFinder AS (
+	SELECT 
+		emp_id, name, department,
+        ROW_NUMBER() OVER(
+        PARTITION BY emp_id, name, department
+        ORDER BY emp_id
+        ) AS row_num
+	FROM employees_raw
+)
+DELETE FROM DuplicateFinder -- CTE expresson to remove duplicates
+WHERE row_num > 1;
+
+-- Data tables -- 
+-- Fixing the Types, Formats of the data columns
+SHOW COLUMNS FROM employees_raw;
+
+DESCRIBE employees_raw;
+
+SELECT 
+	column_name, data_type
+FROM information_schema.columns
+WHERE table_name = 'employees_raw';
+
+-- CAST - is used to change the data types
+-- if data is stored as text (VARCHAR) 
+-- 
+
+SELECT * FROM employees_raw;
 
 -- CAST()
--- CONVERT()
+SELECT 
+	name, department, join_date,
+    CAST(join_date AS DATE) AS real_date
+FROM employees_raw;
 
+-- CONVERT(data, target_type)
+-- convert will let you change type and reformat
+-- allows you to reformat the output as well
+-- 
+SELECT 
+	name, join_date,
+    -- 
+    CONVERT( , join_date, ) AS format_date
+FROM employees_raw;
+
+-- 
+SELECT
+	STR_TO_DATE(join_date, '%d%m%Y')
+    
+    
+-- duplicate removal -- convert function (style code) -- date formats
+-- 
 
 
 
