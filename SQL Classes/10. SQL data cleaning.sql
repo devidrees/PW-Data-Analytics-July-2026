@@ -116,14 +116,16 @@ FROM employees_raw;
 -- allows you to reformat the output as well
 -- 
 SELECT 
-	name, join_date,
-    -- 
-    CONVERT( , join_date, ) AS format_date
+    name, 
+    join_date,
+    -- Formats the date as mm/dd/yyyy
+    DATE_FORMAT(join_date, '%m-%d-%Y') AS format_date
 FROM employees_raw;
+
 
 -- 
 SELECT
-	STR_TO_DATE(join_date, '%d%m%Y')
+	STR_TO_DATE(join_date, '%d%m%Y');
     
     
 -- duplicate removal -- convert function (style code) -- date formats
